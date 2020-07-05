@@ -24,16 +24,18 @@ function makeTasks(text) {
 
 function addTask() {
   const taskValue = taskElement.value;
+  const newTaskValue = "new task";
 
   if (!taskValue) {
     alert("please put in a value");
     return;
   }
 
-  taskElement.value = "";
   makeTasks(taskValue);
-
-  localStorage.setItem(keyName, taskValue);
+  const taskArray = [taskValue];
+  taskArray.push(newTaskValue);
+  localStorage.setItem(keyName, JSON.stringify(taskArray));
+  taskElement.value = "";
 }
 
 function addTaskByEnter(e) {
