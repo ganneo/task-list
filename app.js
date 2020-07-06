@@ -7,7 +7,7 @@ const deleteTaskBtnIElement = document.getElementById("icon-remove");
 const ulElement = document.getElementById("tasks");
 const filterElement = document.getElementById("filter-wrapper");
 
-function makeTasks(text) {
+function makeTask(text) {
   const liElement = document.createElement("li");
   const aRemove = document.createElement("a");
   const iconRemove = document.createElement("i");
@@ -30,7 +30,7 @@ function addTask() {
     return;
   }
 
-  makeTasks(taskValue);
+  makeTask(taskValue);
   const oldTask = localStorage.getItem(keyName);
   const taskArray = oldTask ? JSON.parse(oldTask) : new Array();
   taskArray.push(taskValue);
@@ -70,12 +70,10 @@ function deleteTask(e) {
     e.target.parentElement.parentElement.remove();
   }
 }
-function deleteAllTasks() {
-  let ulLength = document.getElementById("tasks").childElementCount;
 
-  while (ulLength > 0) {
+function deleteAllTasks() {
+  while (document.getElementById("tasks").childElementCount > 0) {
     ulElement.removeChild(ulElement.childNodes[0]);
-    ulLength = document.getElementById("tasks").childElementCount;
   }
 
   localStorage.removeItem(keyName);
@@ -84,14 +82,24 @@ function deleteAllTasks() {
 function filterTasks() {
   const filterValue = document.getElementById("fiter").value;
 
-  console.log(filterValue);
+  Array.from(document.getElementsByTagName("LI")).forEach(function (element) {
+    if (
+      element.firstChild.textContent
+        .toLowerCase()
+        .includes(filterValue.toLowerCase())
+    ) {
+      element.style.display = "block";
+    } else {
+      element.style.display = "none";
+    }
+  });
 }
 
 function recoverTasks() {
   const taskString = localStorage.getItem(keyName);
   if (taskString) {
     const taskArray = JSON.parse(taskString);
-    taskArray.forEach(makeTasks);
+    taskArray.forEach(makeTask);
   }
 }
 
