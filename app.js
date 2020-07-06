@@ -24,7 +24,6 @@ function makeTasks(text) {
 
 function addTask() {
   const taskValue = taskElement.value;
-  const newTaskValue = "new task";
 
   if (!taskValue) {
     alert("please put in a value");
@@ -32,15 +31,14 @@ function addTask() {
   }
 
   makeTasks(taskValue);
-  const taskArray = [taskValue];
-  taskArray.push(newTaskValue);
+  const oldTask = localStorage.getItem(keyName);
+  const taskArray = oldTask ? JSON.parse(oldTask) : new Array();
+  taskArray.push(taskValue);
   localStorage.setItem(keyName, JSON.stringify(taskArray));
   taskElement.value = "";
 }
 
 function addTaskByEnter(e) {
-  const taskElementLength = taskElement.value.length;
-
   if (e.keyCode === 13) {
     addTaskBtn.click();
     e.preventDefault();
@@ -52,6 +50,8 @@ function addTaskByEnter(e) {
     taskElement.value = "";
   }
 
+  const taskElementLength = taskElement.value.length;
+
   if (taskElementLength > 29) {
     alert("please chose a smaller amount of text to make your task");
   }
@@ -59,20 +59,26 @@ function addTaskByEnter(e) {
 
 function deleteTask(e) {
   if (e.target.tagName === "I") {
+    const deleteTaskText =
+      e.target.parentElement.parentElement.firstChild.textContent;
+    const taskArray = JSON.parse(localStorage.getItem(keyName));
+    const filterTaskArray = taskArray.filter(function (task) {
+      return task !== deleteTaskText;
+    });
+    localStorage.setItem(keyName, JSON.stringify(filterTaskArray));
+
     e.target.parentElement.parentElement.remove();
   }
 }
-
 function deleteAllTasks() {
   let ulLength = document.getElementById("tasks").childElementCount;
-  if (ulLength === 0) {
-    alert("Add some tasks");
-  }
 
   while (ulLength > 0) {
     ulElement.removeChild(ulElement.childNodes[0]);
     ulLength = document.getElementById("tasks").childElementCount;
   }
+
+  localStorage.removeItem(keyName);
 }
 
 function filterTasks() {
@@ -82,7 +88,11 @@ function filterTasks() {
 }
 
 function recoverTasks() {
-  makeTasks(localStorage.getItem(keyName));
+  const taskString = localStorage.getItem(keyName);
+  if (taskString) {
+    const taskArray = JSON.parse(taskString);
+    taskArray.forEach(makeTasks);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", recoverTasks);
